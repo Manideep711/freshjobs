@@ -1,0 +1,757 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>FreshLeads — Daily Job Board</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet" />
+<style>
+  :root {
+    --bg: #0a0a0f;
+    --bg2: #111118;
+    --bg3: #1a1a24;
+    --card: #13131c;
+    --border: rgba(255,255,255,0.07);
+    --border2: rgba(255,255,255,0.13);
+    --text: #e8e8f0;
+    --muted: #6b6b80;
+    --dim: #3a3a50;
+    --accent: #7c6af7;
+    --accent2: #a78bfa;
+    --green: #34d399;
+    --amber: #fbbf24;
+    --coral: #f87171;
+    --teal: #22d3ee;
+    --pink: #f472b6;
+  }
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  html { scroll-behavior: smooth; }
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    line-height: 1.6;
+  }
+
+  /* ── HEADER ── */
+  .header {
+    border-bottom: 1px solid var(--border);
+    padding: 1.25rem 2rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    position: sticky;
+    top: 0;
+    background: rgba(10,10,15,0.92);
+    backdrop-filter: blur(12px);
+    z-index: 100;
+  }
+  .logo {
+    font-family: 'Space Mono', monospace;
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: var(--text);
+    letter-spacing: -0.02em;
+  }
+  .logo span { color: var(--accent2); }
+  .header-right {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+  }
+  .last-updated {
+    font-size: 0.75rem;
+    color: var(--muted);
+    font-family: 'Space Mono', monospace;
+  }
+  .live-dot {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 0.72rem;
+    color: var(--green);
+    font-family: 'Space Mono', monospace;
+  }
+  .live-dot::before {
+    content: '';
+    width: 6px; height: 6px;
+    background: var(--green);
+    border-radius: 50%;
+    animation: pulse 2s ease-in-out infinite;
+  }
+  @keyframes pulse {
+    0%, 100% { opacity: 1; transform: scale(1); }
+    50% { opacity: 0.5; transform: scale(0.8); }
+  }
+
+  /* ── HERO ── */
+  .hero {
+    padding: 3rem 2rem 2rem;
+    max-width: 1200px;
+    margin: 0 auto;
+  }
+  .hero h1 {
+    font-size: clamp(2rem, 5vw, 3.2rem);
+    font-weight: 600;
+    letter-spacing: -0.03em;
+    line-height: 1.1;
+    margin-bottom: 0.5rem;
+  }
+  .hero h1 .grad {
+    background: linear-gradient(135deg, var(--accent2) 0%, var(--teal) 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+  .hero p {
+    color: var(--muted);
+    font-size: 1rem;
+    margin-bottom: 2rem;
+  }
+
+  /* ── STATS ── */
+  .stats {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+    gap: 12px;
+    margin-bottom: 2rem;
+  }
+  .stat-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 1rem 1.25rem;
+    transition: border-color 0.2s;
+  }
+  .stat-card:hover { border-color: var(--border2); }
+  .stat-val {
+    font-family: 'Space Mono', monospace;
+    font-size: 1.8rem;
+    font-weight: 700;
+    color: var(--text);
+    line-height: 1;
+  }
+  .stat-lbl {
+    font-size: 0.72rem;
+    color: var(--muted);
+    margin-top: 4px;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+  }
+
+  /* ── CONTROLS ── */
+  .controls {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    align-items: center;
+    margin-bottom: 1.5rem;
+  }
+  .search-wrap {
+    flex: 1;
+    min-width: 200px;
+    position: relative;
+  }
+  .search-wrap input {
+    width: 100%;
+    background: var(--card);
+    border: 1px solid var(--border);
+    color: var(--text);
+    font-family: 'DM Sans', sans-serif;
+    font-size: 0.9rem;
+    padding: 0.6rem 1rem 0.6rem 2.5rem;
+    border-radius: 8px;
+    outline: none;
+    transition: border-color 0.2s;
+  }
+  .search-wrap input:focus { border-color: var(--accent); }
+  .search-wrap input::placeholder { color: var(--muted); }
+  .search-icon {
+    position: absolute;
+    left: 0.75rem;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--muted);
+    font-size: 0.9rem;
+    pointer-events: none;
+  }
+  .ctrl-select {
+    background: var(--card);
+    border: 1px solid var(--border);
+    color: var(--text);
+    font-family: 'DM Sans', sans-serif;
+    font-size: 0.85rem;
+    padding: 0.6rem 0.9rem;
+    border-radius: 8px;
+    outline: none;
+    cursor: pointer;
+    transition: border-color 0.2s;
+  }
+  .ctrl-select:focus { border-color: var(--accent); }
+
+  /* ── FILTER PILLS ── */
+  .filter-section { margin-bottom: 1.5rem; }
+  .filter-label {
+    font-size: 0.72rem;
+    color: var(--muted);
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    margin-bottom: 8px;
+  }
+  .pills {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 7px;
+  }
+  .pill {
+    font-size: 0.8rem;
+    padding: 5px 14px;
+    border-radius: 20px;
+    border: 1px solid var(--border);
+    background: transparent;
+    color: var(--muted);
+    cursor: pointer;
+    transition: all 0.15s;
+    font-family: 'DM Sans', sans-serif;
+    white-space: nowrap;
+  }
+  .pill:hover { border-color: var(--border2); color: var(--text); }
+  .pill.active {
+    background: rgba(124,106,247,0.15);
+    border-color: var(--accent);
+    color: var(--accent2);
+  }
+  .pill.active.green { background: rgba(52,211,153,0.1); border-color: var(--green); color: var(--green); }
+  .pill.active.amber { background: rgba(251,191,36,0.1); border-color: var(--amber); color: var(--amber); }
+
+  /* ── DIVIDER ── */
+  .divider {
+    border: none;
+    border-top: 1px solid var(--border);
+    margin: 1.5rem 0;
+  }
+
+  /* ── RESULTS HEADER ── */
+  .results-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 1rem;
+  }
+  .results-count {
+    font-size: 0.85rem;
+    color: var(--muted);
+    font-family: 'Space Mono', monospace;
+  }
+  .results-count strong { color: var(--text); }
+
+  /* ── JOB GRID ── */
+  .jobs-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+    gap: 14px;
+    margin-bottom: 4rem;
+  }
+
+  /* ── JOB CARD ── */
+  .job-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 1.25rem;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    transition: border-color 0.2s, transform 0.15s;
+    animation: fadeIn 0.3s ease both;
+    cursor: pointer;
+  }
+  .job-card:hover {
+    border-color: var(--border2);
+    transform: translateY(-2px);
+  }
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(8px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  .card-top {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 8px;
+  }
+  .source-badge {
+    font-size: 0.68rem;
+    font-family: 'Space Mono', monospace;
+    padding: 3px 8px;
+    border-radius: 6px;
+    background: var(--bg3);
+    color: var(--muted);
+    white-space: nowrap;
+    flex-shrink: 0;
+  }
+  .source-badge.twitter { color: var(--teal); background: rgba(34,211,238,0.08); }
+  .source-badge.internshala { color: var(--pink); background: rgba(244,114,182,0.08); }
+  .source-badge.naukri { color: var(--amber); background: rgba(251,191,36,0.08); }
+
+  .card-title {
+    font-size: 0.95rem;
+    font-weight: 500;
+    color: var(--text);
+    line-height: 1.4;
+    flex: 1;
+  }
+  .card-company {
+    font-size: 0.82rem;
+    color: var(--muted);
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .card-desc {
+    font-size: 0.82rem;
+    color: var(--muted);
+    line-height: 1.55;
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+  .card-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+  }
+  .tag {
+    font-size: 0.7rem;
+    padding: 3px 8px;
+    border-radius: 5px;
+    font-weight: 500;
+  }
+  .tag.mern { background: rgba(124,106,247,0.12); color: var(--accent2); }
+  .tag.java { background: rgba(251,191,36,0.1); color: var(--amber); }
+  .tag.ml { background: rgba(34,211,238,0.1); color: var(--teal); }
+  .tag.data { background: rgba(52,211,153,0.1); color: var(--green); }
+  .tag.intern { background: rgba(244,114,182,0.1); color: var(--pink); }
+  .tag.general { background: rgba(255,255,255,0.05); color: var(--muted); }
+  .tag.remote { background: rgba(52,211,153,0.08); color: var(--green); }
+  .tag.fulltime { background: rgba(124,106,247,0.08); color: var(--accent2); }
+
+  .card-footer {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding-top: 8px;
+    border-top: 1px solid var(--border);
+  }
+  .card-loc {
+    font-size: 0.75rem;
+    color: var(--muted);
+    display: flex;
+    align-items: center;
+    gap: 4px;
+  }
+  .apply-btn {
+    font-family: 'DM Sans', sans-serif;
+    font-size: 0.78rem;
+    font-weight: 500;
+    padding: 5px 14px;
+    background: rgba(124,106,247,0.12);
+    color: var(--accent2);
+    border: 1px solid rgba(124,106,247,0.25);
+    border-radius: 6px;
+    text-decoration: none;
+    transition: all 0.15s;
+    cursor: pointer;
+  }
+  .apply-btn:hover {
+    background: rgba(124,106,247,0.22);
+    border-color: var(--accent);
+  }
+  .save-btn {
+    background: transparent;
+    border: none;
+    color: var(--muted);
+    cursor: pointer;
+    font-size: 1rem;
+    padding: 4px;
+    transition: color 0.15s;
+  }
+  .save-btn:hover, .save-btn.saved { color: var(--amber); }
+
+  /* ── EMPTY STATE ── */
+  .empty {
+    text-align: center;
+    padding: 5rem 2rem;
+    color: var(--muted);
+    grid-column: 1 / -1;
+  }
+  .empty-icon { font-size: 3rem; margin-bottom: 1rem; }
+  .empty h3 { font-size: 1rem; color: var(--dim); margin-bottom: 0.5rem; }
+  .empty p { font-size: 0.85rem; }
+
+  /* ── LOADING ── */
+  .loading {
+    text-align: center;
+    padding: 5rem;
+    color: var(--muted);
+    grid-column: 1 / -1;
+    font-family: 'Space Mono', monospace;
+    font-size: 0.85rem;
+  }
+
+  /* ── SAVED PANEL (bookmark drawer) ── */
+  #saved-count {
+    font-family: 'Space Mono', monospace;
+    font-size: 0.72rem;
+    background: var(--accent);
+    color: #fff;
+    border-radius: 10px;
+    padding: 1px 6px;
+    display: none;
+  }
+  #saved-count.show { display: inline; }
+
+  /* ── MAIN LAYOUT ── */
+  .main { max-width: 1200px; margin: 0 auto; padding: 0 2rem; }
+
+  /* ── ACTIVE FILTERS BAR ── */
+  .active-filters {
+    display: flex;
+    gap: 6px;
+    flex-wrap: wrap;
+    margin-bottom: 1rem;
+    min-height: 0;
+  }
+  .filter-chip {
+    font-size: 0.75rem;
+    padding: 3px 10px;
+    background: rgba(124,106,247,0.1);
+    color: var(--accent2);
+    border-radius: 12px;
+    border: 1px solid rgba(124,106,247,0.2);
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    cursor: pointer;
+  }
+  .filter-chip:hover { background: rgba(124,106,247,0.2); }
+</style>
+</head>
+<body>
+
+<header class="header">
+  <div class="logo">Fresh<span>Leads</span>.dev</div>
+  <div class="header-right">
+    <span class="live-dot" id="live-status">loading...</span>
+    <span class="last-updated" id="last-updated">—</span>
+  </div>
+</header>
+
+<div class="main">
+  <div class="hero">
+    <h1>Your daily <span class="grad">job leads</span>,<br/>served fresh every morning.</h1>
+    <p>Scraped at midnight from Twitter/X, Internshala & Naukri — freshers & interns only.</p>
+
+    <!-- STATS -->
+    <div class="stats" id="stats">
+      <div class="stat-card"><div class="stat-val" id="s-total">—</div><div class="stat-lbl">Total Leads</div></div>
+      <div class="stat-card"><div class="stat-val" id="s-remote">—</div><div class="stat-lbl">Remote Roles</div></div>
+      <div class="stat-card"><div class="stat-val" id="s-intern">—</div><div class="stat-lbl">Internships</div></div>
+      <div class="stat-card"><div class="stat-val" id="s-sources">—</div><div class="stat-lbl">Sources</div></div>
+    </div>
+
+    <!-- SEARCH + SORT -->
+    <div class="controls">
+      <div class="search-wrap">
+        <span class="search-icon">⌕</span>
+        <input type="text" id="search" placeholder="Search company, role, tech..." />
+      </div>
+      <select class="ctrl-select" id="sort">
+        <option value="newest">Newest first</option>
+        <option value="source">By source</option>
+        <option value="company">By company</option>
+      </select>
+      <select class="ctrl-select" id="job-type">
+        <option value="all">All types</option>
+        <option value="full_time">Full-time</option>
+        <option value="internship">Internship</option>
+      </select>
+    </div>
+
+    <!-- ROLE FILTER PILLS -->
+    <div class="filter-section">
+      <div class="filter-label">Role</div>
+      <div class="pills" id="role-pills">
+        <button class="pill active" data-role="all">All Roles</button>
+        <button class="pill" data-role="mern_fullstack">MERN / JS Fullstack</button>
+        <button class="pill" data-role="java_fullstack">Java Fullstack</button>
+        <button class="pill" data-role="machine_learning">Machine Learning</button>
+        <button class="pill" data-role="data_analyst">Data Analyst</button>
+        <button class="pill" data-role="general_fresher">General Fresher</button>
+      </div>
+    </div>
+
+    <!-- LOCATION FILTER PILLS -->
+    <div class="filter-section">
+      <div class="filter-label">Location</div>
+      <div class="pills" id="loc-pills">
+        <button class="pill active green" data-loc="all">Anywhere</button>
+        <button class="pill" data-loc="remote">Remote Only</button>
+        <button class="pill" data-loc="india">India (Onsite)</button>
+      </div>
+    </div>
+
+    <!-- SOURCE FILTER -->
+    <div class="filter-section">
+      <div class="filter-label">Source</div>
+      <div class="pills" id="src-pills">
+        <button class="pill active amber" data-src="all">All Sources</button>
+        <button class="pill" data-src="Twitter/X">Twitter / X</button>
+        <button class="pill" data-src="Internshala">Internshala</button>
+        <button class="pill" data-src="Naukri">Naukri</button>
+      </div>
+    </div>
+
+  </div>
+
+  <hr class="divider" />
+
+  <div class="results-header">
+    <span class="results-count">Showing <strong id="showing-count">—</strong> leads</span>
+    <div style="display:flex;align-items:center;gap:8px;">
+      <span style="font-size:0.8rem;color:var(--muted);">Bookmarked</span>
+      <span id="saved-count">0</span>
+    </div>
+  </div>
+
+  <div class="active-filters" id="active-filters"></div>
+
+  <div class="jobs-grid" id="jobs-grid">
+    <div class="loading">⟳ Loading fresh leads...</div>
+  </div>
+</div>
+
+<script>
+  let allJobs = [];
+  let savedJobs = new Set(JSON.parse(localStorage.getItem('savedJobs') || '[]'));
+
+  let filters = {
+    role: 'all',
+    loc: 'all',
+    src: 'all',
+    type: 'all',
+    search: '',
+    sort: 'newest',
+  };
+
+  const roleColors = {
+    mern_fullstack: 'mern',
+    java_fullstack: 'java',
+    machine_learning: 'ml',
+    data_analyst: 'data',
+    internship: 'intern',
+    general_fresher: 'general',
+  };
+
+  const roleLabels = {
+    mern_fullstack: 'MERN/JS',
+    java_fullstack: 'Java FS',
+    machine_learning: 'ML/AI',
+    data_analyst: 'Data',
+    internship: 'Intern',
+    general_fresher: 'Fresher',
+  };
+
+  function sourceClass(src) {
+    if (src.toLowerCase().includes('twitter')) return 'twitter';
+    if (src.toLowerCase().includes('internshala')) return 'internshala';
+    if (src.toLowerCase().includes('naukri')) return 'naukri';
+    return '';
+  }
+
+  function isRemote(job) {
+    return ['remote', 'wfh', 'work from home'].some(k =>
+      (job.location || '').toLowerCase().includes(k) ||
+      (job.description || '').toLowerCase().includes(k)
+    );
+  }
+
+  function applyFilters() {
+    let jobs = [...allJobs];
+
+    if (filters.search) {
+      const q = filters.search.toLowerCase();
+      jobs = jobs.filter(j =>
+        j.title.toLowerCase().includes(q) ||
+        j.company.toLowerCase().includes(q) ||
+        (j.description || '').toLowerCase().includes(q)
+      );
+    }
+    if (filters.role !== 'all') {
+      jobs = jobs.filter(j => (j.roles || []).includes(filters.role));
+    }
+    if (filters.loc === 'remote') {
+      jobs = jobs.filter(j => isRemote(j));
+    } else if (filters.loc === 'india') {
+      jobs = jobs.filter(j => !isRemote(j));
+    }
+    if (filters.src !== 'all') {
+      jobs = jobs.filter(j => j.source === filters.src);
+    }
+    if (filters.type !== 'all') {
+      jobs = jobs.filter(j => j.type === filters.type);
+    }
+
+    if (filters.sort === 'source') jobs.sort((a,b) => a.source.localeCompare(b.source));
+    else if (filters.sort === 'company') jobs.sort((a,b) => a.company.localeCompare(b.company));
+
+    return jobs;
+  }
+
+  function renderStats() {
+    document.getElementById('s-total').textContent = allJobs.length;
+    document.getElementById('s-remote').textContent = allJobs.filter(j => isRemote(j)).length;
+    document.getElementById('s-intern').textContent = allJobs.filter(j => j.type === 'internship').length;
+    const srcs = new Set(allJobs.map(j => j.source));
+    document.getElementById('s-sources').textContent = srcs.size;
+  }
+
+  function renderCard(job) {
+    const isSaved = savedJobs.has(job.id);
+    const remote = isRemote(job);
+    const tags = (job.roles || []).map(r =>
+      `<span class="tag ${roleColors[r] || 'general'}">${roleLabels[r] || r}</span>`
+    ).join('');
+    const typTag = job.type === 'internship'
+      ? `<span class="tag intern">Internship</span>`
+      : `<span class="tag fulltime">Full-time</span>`;
+    const remTag = remote ? `<span class="tag remote">Remote</span>` : '';
+    const srcClass = sourceClass(job.source);
+
+    return `
+      <div class="job-card" id="card-${job.id}">
+        <div class="card-top">
+          <div class="card-title">${escHtml(job.title)}</div>
+          <span class="source-badge ${srcClass}">${escHtml(job.source)}</span>
+        </div>
+        <div class="card-company">🏢 ${escHtml(job.company)}</div>
+        <div class="card-desc">${escHtml(job.description || '')}</div>
+        <div class="card-tags">${tags}${typTag}${remTag}</div>
+        <div class="card-footer">
+          <span class="card-loc">📍 ${escHtml(job.location || 'India')}</span>
+          <div style="display:flex;align-items:center;gap:8px;">
+            <button class="save-btn ${isSaved ? 'saved' : ''}" onclick="toggleSave('${job.id}', this)" title="Bookmark">
+              ${isSaved ? '★' : '☆'}
+            </button>
+            ${job.link
+              ? `<a href="${escHtml(job.link)}" target="_blank" class="apply-btn">Apply →</a>`
+              : `<span class="apply-btn" style="opacity:0.4;cursor:default;">No link</span>`}
+          </div>
+        </div>
+      </div>
+    `;
+  }
+
+  function render() {
+    const jobs = applyFilters();
+    const grid = document.getElementById('jobs-grid');
+    document.getElementById('showing-count').textContent = jobs.length;
+
+    if (jobs.length === 0) {
+      grid.innerHTML = `
+        <div class="empty">
+          <div class="empty-icon">🔍</div>
+          <h3>No leads match your filters</h3>
+          <p>Try adjusting the role, location, or search query.</p>
+        </div>`;
+      return;
+    }
+    grid.innerHTML = jobs.map(renderCard).join('');
+
+    // update saved count badge
+    const sc = document.getElementById('saved-count');
+    sc.textContent = savedJobs.size;
+    sc.classList.toggle('show', savedJobs.size > 0);
+  }
+
+  function escHtml(str) {
+    return String(str)
+      .replace(/&/g,'&amp;')
+      .replace(/</g,'&lt;')
+      .replace(/>/g,'&gt;')
+      .replace(/"/g,'&quot;');
+  }
+
+  function toggleSave(id, btn) {
+    if (savedJobs.has(id)) {
+      savedJobs.delete(id);
+      btn.classList.remove('saved');
+      btn.textContent = '☆';
+    } else {
+      savedJobs.add(id);
+      btn.classList.add('saved');
+      btn.textContent = '★';
+    }
+    localStorage.setItem('savedJobs', JSON.stringify([...savedJobs]));
+    const sc = document.getElementById('saved-count');
+    sc.textContent = savedJobs.size;
+    sc.classList.toggle('show', savedJobs.size > 0);
+  }
+
+  // ── pill filter wiring
+  function wirePills(groupId, filterKey) {
+    document.getElementById(groupId).querySelectorAll('.pill').forEach(btn => {
+      btn.addEventListener('click', () => {
+        document.getElementById(groupId).querySelectorAll('.pill').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        filters[filterKey] = btn.dataset[filterKey === 'loc' ? 'loc' : filterKey === 'src' ? 'src' : 'role'];
+        render();
+      });
+    });
+  }
+  wirePills('role-pills', 'role');
+  wirePills('loc-pills', 'loc');
+  wirePills('src-pills', 'src');
+
+  document.getElementById('search').addEventListener('input', e => {
+    filters.search = e.target.value.trim();
+    render();
+  });
+  document.getElementById('sort').addEventListener('change', e => {
+    filters.sort = e.target.value;
+    render();
+  });
+  document.getElementById('job-type').addEventListener('change', e => {
+    filters.type = e.target.value;
+    render();
+  });
+
+  // ── load data
+  async function loadJobs() {
+    try {
+      const res = await fetch('jobs.json?t=' + Date.now());
+      const data = await res.json();
+      allJobs = data.jobs || [];
+
+      // last updated
+      const lu = new Date(data.last_updated);
+      document.getElementById('last-updated').textContent =
+        'Updated ' + lu.toLocaleDateString('en-IN', { day:'numeric', month:'short', hour:'2-digit', minute:'2-digit' });
+      document.getElementById('live-status').textContent = 'fresh';
+
+      renderStats();
+      render();
+    } catch (e) {
+      document.getElementById('jobs-grid').innerHTML =
+        `<div class="empty"><div class="empty-icon">⚠️</div><h3>Could not load jobs.json</h3><p>Run the scraper first, or check the file path.</p></div>`;
+      document.getElementById('live-status').textContent = 'offline';
+    }
+  }
+
+  loadJobs();
+</script>
+</body>
+</html>
